@@ -1,4 +1,5 @@
 
+import React from 'react';
 import { Home, BarChart2, PlusCircle, Settings } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
