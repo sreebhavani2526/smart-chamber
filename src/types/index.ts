@@ -1,9 +1,20 @@
+export interface Transaction {
+  id: string;
+  amount: number;
+  type: 'deposit' | 'withdrawal' | 'transfer' | 'payment';
+  chamber?: TransactionChamber;
+  description: string;
+  date: Date;
+  category?: string;
+}
+
+export type TransactionChamber = 'main' | 'savings';
 
 export interface User {
   id: string;
   name: string;
   email: string;
-  avatar?: string;
+  profileImage: string;
 }
 
 export interface Account {
@@ -11,15 +22,15 @@ export interface Account {
   savingsBalance: number;
 }
 
-export type TransactionType = 'deposit' | 'withdrawal' | 'transfer' | 'payment';
-export type TransactionChamber = 'main' | 'savings';
-
-export interface Transaction {
+// Add new types for goals
+export interface SavingsGoal {
   id: string;
-  amount: number;
-  type: TransactionType;
-  chamber: TransactionChamber;
-  description: string;
-  date: Date;
-  category?: string;
+  title: string;
+  targetAmount: number;
+  currentAmount: number;
+  deadline: Date;
+  category: GoalCategory;
+  createdAt: Date;
 }
+
+export type GoalCategory = 'vacation' | 'emergency' | 'education' | 'housing' | 'retirement' | 'other';

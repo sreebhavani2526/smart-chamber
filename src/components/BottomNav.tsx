@@ -1,16 +1,25 @@
 
 import React from 'react';
-import { Home, BarChart2, PlusCircle, Settings } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Home, BarChart2, PlusCircle, Settings, Target } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
 
 const BottomNav = () => {
+  const location = useLocation();
+  const currentPath = location.pathname;
+
+  const getItemClass = (path: string) => {
+    return currentPath === path 
+      ? "flex flex-col items-center p-2 text-main"
+      : "flex flex-col items-center p-2 text-neutral";
+  };
+
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-border flex justify-around items-center p-2 z-10">
-      <Link to="/" className="flex flex-col items-center p-2 text-main">
+      <Link to="/" className={getItemClass('/')}>
         <Home size={22} />
         <span className="text-xs mt-1">Home</span>
       </Link>
-      <Link to="/stats" className="flex flex-col items-center p-2 text-neutral">
+      <Link to="/stats" className={getItemClass('/stats')}>
         <BarChart2 size={22} />
         <span className="text-xs mt-1">Stats</span>
       </Link>
@@ -19,7 +28,11 @@ const BottomNav = () => {
           <PlusCircle size={24} />
         </button>
       </div>
-      <Link to="/profile" className="flex flex-col items-center p-2 text-neutral">
+      <Link to="/goals" className={getItemClass('/goals')}>
+        <Target size={22} />
+        <span className="text-xs mt-1">Goals</span>
+      </Link>
+      <Link to="/profile" className={getItemClass('/profile')}>
         <Settings size={22} />
         <span className="text-xs mt-1">Profile</span>
       </Link>
