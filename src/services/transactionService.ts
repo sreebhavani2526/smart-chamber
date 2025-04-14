@@ -17,8 +17,8 @@ export const fetchTransactions = async (userId: string): Promise<Transaction[]> 
 
   return data.map(item => ({
     id: item.id,
-    amount: parseFloat(item.amount),
-    type: item.type,
+    amount: typeof item.amount === 'string' ? parseFloat(item.amount) : item.amount,
+    type: item.type as 'deposit' | 'withdrawal' | 'transfer' | 'payment',
     chamber: item.chamber as TransactionChamber,
     description: item.description,
     date: new Date(item.created_at),
@@ -63,9 +63,9 @@ export const createTransaction = async (
 
     const transaction: Transaction = {
       id: data.id,
-      amount: parseFloat(data.amount),
-      type: data.type,
-      chamber: data.chamber,
+      amount: typeof data.amount === 'string' ? parseFloat(data.amount) : data.amount,
+      type: data.type as 'deposit' | 'withdrawal' | 'transfer' | 'payment',
+      chamber: data.chamber as TransactionChamber,
       description: data.description,
       date: new Date(data.created_at),
       category: data.category
@@ -81,14 +81,14 @@ export const createTransaction = async (
 const updateBalance = async (
   userId: string, 
   amount: number, 
-  type: string, 
+  type: 'deposit' | 'withdrawal' | 'transfer' | 'payment', 
   chamber?: TransactionChamber
 ): Promise<{ error: any }> => {
   try {
     // Get current balances
     const { data, error } = await supabase
       .from('users')
-      .select('main_balance, savings_balance')
+      .select('main_account_balance, savings_chamber_balance')
       .eq('id', userId)
       .single();
 
@@ -96,8 +96,10 @@ const updateBalance = async (
       return { error };
     }
 
-    let mainBalance = parseFloat(data.main_balance);
-    let savingsBalance = parseFloat(data.savings_balance);
+    let mainBalance = typeof data.main_account_balance === 'string' ? 
+      parseFloat(data.main_account_balance) : data.main_account_balance;
+    let savingsBalance = typeof data.savings_chamber_balance === 'string' ? 
+      parseFloat(data.savings_chamber_balance) : data.savings_chamber_balance;
 
     // Update balances based on transaction type
     if (type === 'transfer') {
@@ -119,8 +121,8 @@ const updateBalance = async (
     const { error: updateError } = await supabase
       .from('users')
       .update({
-        main_balance: mainBalance,
-        savings_balance: savingsBalance
+        main_account_balance: mainBalance,
+        savings_chamber_balance: savingsBalance
       })
       .eq('id', userId);
 

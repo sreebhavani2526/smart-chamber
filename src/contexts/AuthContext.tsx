@@ -37,7 +37,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const { data, error } = await supabase
           .from('users')
-          .select('main_balance, savings_balance')
+          .select('main_account_balance, savings_chamber_balance')
           .eq('id', mockUser.id)
           .single();
 
@@ -46,8 +46,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           // If no data, create initial account with mock data
           await supabase.from('users').insert({
             id: mockUser.id,
-            main_balance: 1500, // Initial mock balance
-            savings_balance: 2500 // Initial mock balance
+            banking_id: 'mock-banking-id',
+            email: mockUser.email,
+            password: 'mock-password',
+            main_account_balance: 1500,
+            savings_chamber_balance: 2500
           });
           
           setAccount({
@@ -56,8 +59,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           });
         } else if (data) {
           setAccount({
-            mainBalance: parseFloat(data.main_balance),
-            savingsBalance: parseFloat(data.savings_balance)
+            mainBalance: parseFloat(data.main_account_balance),
+            savingsBalance: parseFloat(data.savings_chamber_balance)
           });
         }
         
@@ -75,7 +78,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const { data, error } = await supabase
         .from('users')
-        .select('main_balance, savings_balance')
+        .select('main_account_balance, savings_chamber_balance')
         .eq('id', mockUser.id)
         .single();
 
@@ -86,8 +89,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (data) {
         setAccount({
-          mainBalance: parseFloat(data.main_balance),
-          savingsBalance: parseFloat(data.savings_balance)
+          mainBalance: parseFloat(data.main_account_balance),
+          savingsBalance: parseFloat(data.savings_chamber_balance)
         });
       }
     } catch (err) {

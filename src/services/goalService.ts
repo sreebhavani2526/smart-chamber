@@ -17,8 +17,8 @@ export const fetchSavingsGoals = async (userId: string): Promise<SavingsGoal[]> 
   return data.map(item => ({
     id: item.id,
     title: item.title,
-    targetAmount: parseFloat(item.target_amount),
-    currentAmount: parseFloat(item.current_amount),
+    targetAmount: typeof item.target_amount === 'string' ? parseFloat(item.target_amount) : item.target_amount,
+    currentAmount: typeof item.current_amount === 'string' ? parseFloat(item.current_amount) : item.current_amount,
     deadline: new Date(item.deadline),
     category: item.category as GoalCategory,
     createdAt: new Date(item.created_at)
@@ -40,7 +40,7 @@ export const createSavingsGoal = async (
         title,
         target_amount: targetAmount,
         current_amount: 0,
-        deadline,
+        deadline: deadline.toISOString(),
         category
       })
       .select()
@@ -53,8 +53,8 @@ export const createSavingsGoal = async (
     const goal: SavingsGoal = {
       id: data.id,
       title: data.title,
-      targetAmount: parseFloat(data.target_amount),
-      currentAmount: parseFloat(data.current_amount),
+      targetAmount: typeof data.target_amount === 'string' ? parseFloat(data.target_amount) : data.target_amount,
+      currentAmount: typeof data.current_amount === 'string' ? parseFloat(data.current_amount) : data.current_amount,
       deadline: new Date(data.deadline),
       category: data.category as GoalCategory,
       createdAt: new Date(data.created_at)
@@ -84,7 +84,10 @@ export const contributeToGoal = async (
     }
 
     // Update the goal's current amount
-    const newAmount = parseFloat(goalData.current_amount) + amount;
+    const currentAmount = typeof goalData.current_amount === 'string' ? 
+      parseFloat(goalData.current_amount) : goalData.current_amount;
+    const newAmount = currentAmount + amount;
+    
     const { error: updateError } = await supabase
       .from('savings_goals')
       .update({ current_amount: newAmount })
