@@ -1,62 +1,103 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import ChamberCard from '@/components/ChamberCard';
 import TransactionsList from '@/components/TransactionsList';
 import BottomNav from '@/components/BottomNav';
 import TransferDialog from '@/components/TransferDialog';
-import { mockUser, mockAccount, mockTransactions } from '@/services/mockData';
-import { TransactionChamber } from '@/types';
+import { TransactionChamber, Transaction } from '@/types';
+import { useAuth } from '@/contexts/AuthContext';
+import { fetchTransactions, createTransaction } from '@/services/transactionService';
+import { toast } from '@/components/ui/use-toast';
 
 const Index = () => {
-  const [account, setAccount] = useState(mockAccount);
-  const [transactions, setTransactions] = useState(mockTransactions);
+  const { user, account, refreshUserData } = useAuth();
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [transferDialogOpen, setTransferDialogOpen] = useState(false);
   const [transferSource, setTransferSource] = useState<TransactionChamber>('main');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (user) {
+      loadTransactions();
+    }
+  }, [user]);
+
+  const loadTransactions = async () => {
+    if (!user) return;
+    
+    setLoading(true);
+    try {
+      const data = await fetchTransactions(user.id);
+      setTransactions(data);
+    } catch (error) {
+      console.error("Error loading transactions:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load transactions. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const openTransferDialog = (source: TransactionChamber) => {
     setTransferSource(source);
     setTransferDialogOpen(true);
   };
   
-  const handleTransfer = (amount: number) => {
-    // Create new transaction
-    const newTransaction = {
-      id: `tx${Date.now()}`,
-      amount: amount,
-      type: 'transfer' as const,
-      chamber: transferSource,
-      description: transferSource === 'main' 
-        ? 'Transfer to Savings Chamber' 
-        : 'Transfer to Main Account',
-      date: new Date(),
-      category: 'Transfer'
-    };
+  const handleTransfer = async (amount: number) => {
+    if (!user || !account) return;
     
-    // Update balances
-    if (transferSource === 'main') {
-      setAccount({
-        mainBalance: account.mainBalance - amount,
-        savingsBalance: account.savingsBalance + amount
+    try {
+      // Create new transaction
+      const description = transferSource === 'main' 
+        ? 'Transfer to Savings Chamber' 
+        : 'Transfer to Main Account';
+        
+      const { transaction, error } = await createTransaction(
+        user.id,
+        amount,
+        'transfer',
+        transferSource,
+        description,
+        'Transfer'
+      );
+      
+      if (error) {
+        throw error;
+      }
+      
+      // Refresh data
+      await refreshUserData();
+      await loadTransactions();
+      
+      toast({
+        title: "Transfer successful",
+        description: `${amount.toFixed(2)} has been transferred ${transferSource === 'main' ? 'to Savings' : 'to Main Account'}.`,
       });
-    } else {
-      setAccount({
-        mainBalance: account.mainBalance + amount,
-        savingsBalance: account.savingsBalance - amount
+    } catch (error) {
+      console.error("Transfer error:", error);
+      toast({
+        title: "Transfer failed",
+        description: "There was an error processing your transfer. Please try again.",
+        variant: "destructive",
       });
     }
-    
-    // Update transactions list
-    setTransactions([newTransaction, ...transactions]);
   };
+
+  if (!user || !account) {
+    return <div className="p-4">Loading...</div>;
+  }
 
   return (
     <div className="flex flex-col min-h-screen pb-20">
-      <Header user={mockUser} />
+      <Header user={user} />
       
       <main className="flex-grow p-4">
         <div className="mb-6">
-          <h2 className="text-2xl font-bold">Welcome back, {mockUser.name.split(' ')[0]}!</h2>
+          <h2 className="text-2xl font-bold">Welcome back, {user.name.split(' ')[0]}!</h2>
           <p className="text-neutral">Manage your chambers wisely</p>
         </div>
         
@@ -75,7 +116,10 @@ const Index = () => {
           />
         </div>
         
-        <TransactionsList transactions={transactions} />
+        <TransactionsList 
+          transactions={transactions} 
+          isLoading={loading}
+        />
       </main>
       
       <BottomNav />

@@ -4,12 +4,14 @@ import { formatDistanceToNow } from 'date-fns';
 import { ArrowUpRight, ArrowDownLeft, RefreshCw, CreditCard } from 'lucide-react';
 import { Transaction } from '@/types';
 import { formatCurrency } from '@/services/mockData';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface TransactionsListProps {
   transactions: Transaction[];
+  isLoading?: boolean;
 }
 
-const TransactionsList: React.FC<TransactionsListProps> = ({ transactions }) => {
+const TransactionsList: React.FC<TransactionsListProps> = ({ transactions, isLoading = false }) => {
   const getTransactionIcon = (type: string) => {
     switch (type) {
       case 'deposit':
@@ -38,6 +40,28 @@ const TransactionsList: React.FC<TransactionsListProps> = ({ transactions }) => 
         return '';
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="mt-6">
+        <h3 className="font-medium text-lg mb-2">Recent Transactions</h3>
+        <div className="space-y-2">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="flex items-center justify-between p-3 rounded-md">
+              <div className="flex items-center">
+                <Skeleton className="h-10 w-10 rounded-full mr-3" />
+                <div>
+                  <Skeleton className="h-4 w-32 mb-1" />
+                  <Skeleton className="h-3 w-24" />
+                </div>
+              </div>
+              <Skeleton className="h-4 w-16" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mt-6">
