@@ -40,9 +40,9 @@ export const createTransaction = async (
       .from('transactions')
       .insert({
         user_id: userId,
-        amount,
-        type,
-        chamber,
+        amount: amount,
+        type: type,
+        chamber: chamber,
         description,
         category
       })
