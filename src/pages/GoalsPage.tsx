@@ -6,13 +6,14 @@ import GoalCard from '@/components/GoalCard';
 import NewGoalForm from '@/components/NewGoalForm';
 import ContributeToGoalDialog from '@/components/ContributeToGoalDialog';
 import BottomNav from '@/components/BottomNav';
-import { SavingsGoal, GoalCategory } from '@/types';
-import { mockSavingsGoals, mockAccount } from '@/services/mockData';
+import { SavingsGoal, GoalCategory, Transaction } from '@/types';
+import { mockSavingsGoals, mockAccount, mockTransactions } from '@/services/mockData';
 import { toast } from '@/components/ui/use-toast';
 
 const GoalsPage = () => {
   const [account, setAccount] = useState(mockAccount);
   const [goals, setGoals] = useState<SavingsGoal[]>(mockSavingsGoals);
+  const [transactions, setTransactions] = useState(mockTransactions);
   const [isNewGoalFormOpen, setIsNewGoalFormOpen] = useState(false);
   const [isContributeDialogOpen, setIsContributeDialogOpen] = useState(false);
   const [selectedGoal, setSelectedGoal] = useState<SavingsGoal | null>(null);
@@ -65,6 +66,26 @@ const GoalsPage = () => {
     setAccount({
       ...account,
       savingsBalance: account.savingsBalance - amount
+    });
+    
+    // Create a new transaction record
+    const goalData = goals.find(g => g.id === goalId);
+    const newTransaction: Transaction = {
+      id: `tx${Date.now()}`,
+      amount: amount,
+      type: 'withdrawal',
+      chamber: 'savings',
+      description: `Contribution to ${goalData?.title} goal`,
+      date: new Date(),
+      category: 'Savings Goal',
+    };
+    
+    // Add the transaction to the transaction list
+    setTransactions([newTransaction, ...transactions]);
+    
+    toast({
+      title: "Contribution successful",
+      description: `Amount contributed to your savings goal.`,
     });
   };
 

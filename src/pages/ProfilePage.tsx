@@ -16,7 +16,7 @@ const ProfilePage = () => {
       <main className="flex-grow p-4">
         <Card className="p-6 mb-6 flex flex-col items-center">
           <Avatar className="h-20 w-20 mb-4">
-            <AvatarImage src={mockUser.avatar} alt={mockUser.name} />
+            <AvatarImage src={mockUser.avatar || mockUser.profileImage} alt={mockUser.name} />
             <AvatarFallback className="bg-main text-white text-xl">
               {mockUser.name.split(' ').map(n => n[0]).join('')}
             </AvatarFallback>

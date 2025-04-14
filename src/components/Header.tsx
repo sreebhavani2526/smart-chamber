@@ -21,7 +21,7 @@ const Header: React.FC<HeaderProps> = ({ user }) => {
           <span className="absolute top-0 right-0 w-2 h-2 bg-main rounded-full"></span>
         </Button>
         <Avatar className="h-8 w-8">
-          <AvatarImage src={user.avatar} alt={user.name} />
+          <AvatarImage src={user.avatar || user.profileImage} alt={user.name} />
           <AvatarFallback className="bg-main text-white">
             {user.name.split(' ').map(n => n[0]).join('')}
           </AvatarFallback>

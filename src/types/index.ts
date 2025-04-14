@@ -1,3 +1,4 @@
+
 export interface Transaction {
   id: string;
   amount: number;
@@ -15,6 +16,7 @@ export interface User {
   name: string;
   email: string;
   profileImage: string;
+  avatar?: string; // Added avatar property
 }
 
 export interface Account {

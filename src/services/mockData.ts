@@ -5,13 +5,12 @@ export const mockUser: User = {
   id: 'user1',
   name: 'John Doe',
   email: 'john.doe@example.com',
-  profilePicture: 'https://via.placeholder.com/150',
+  profileImage: 'https://via.placeholder.com/150',
+  avatar: 'https://via.placeholder.com/150',
 };
 
 // Mock account data
 export const mockAccount: Account = {
-  id: 'account1',
-  userId: 'user1',
   mainBalance: 7850.50,
   savingsBalance: 12500.00,
 };
