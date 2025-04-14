@@ -38,14 +38,14 @@ export const createTransaction = async (
     // Create transaction record
     const { data, error } = await supabase
       .from('transactions')
-      .insert({
+      .insert([{
         user_id: userId,
         amount: amount.toString(), // Convert to string for Supabase
         type: type,
         chamber: chamber,
         description,
         category
-      })
+      }])
       .select()
       .single();
 

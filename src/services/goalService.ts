@@ -35,14 +35,14 @@ export const createSavingsGoal = async (
   try {
     const { data, error } = await supabase
       .from('savings_goals')
-      .insert({
+      .insert([{
         user_id: userId,
         title,
         target_amount: targetAmount.toString(), // Convert to string for Supabase
         current_amount: '0', // Using string for consistency
         deadline: deadline.toISOString(),
         category
-      })
+      }])
       .select()
       .single();
 

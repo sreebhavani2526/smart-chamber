@@ -44,24 +44,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (error) {
           console.error("Error fetching account data:", error);
           // If no data, create initial account with mock data
-          await supabase.from('users').insert({
-            id: mockUser.id,
-            banking_id: 'mock-banking-id',
-            email: mockUser.email,
-            password: 'mock-password',
-            // Convert number values to strings for Supabase
-            main_account_balance: '1500',
-            savings_chamber_balance: '2500'
-          });
-          
-          setAccount({
-            mainBalance: 1500,
-            savingsBalance: 2500
-          });
+          const { error: insertError } = await supabase
+            .from('users')
+            .insert({
+              id: mockUser.id,
+              banking_id: 'mock-banking-id',
+              email: mockUser.email,
+              password: 'mock-password',
+              main_account_balance: '1500',
+              savings_chamber_balance: '2500'
+            });
+            
+          if (insertError) {
+            console.error("Error creating user:", insertError);
+          } else {
+            setAccount({
+              mainBalance: 1500,
+              savingsBalance: 2500
+            });
+          }
         } else if (data) {
           setAccount({
-            mainBalance: parseFloat(data.main_account_balance),
-            savingsBalance: parseFloat(data.savings_chamber_balance)
+            mainBalance: typeof data.main_account_balance === 'string' ? 
+              parseFloat(data.main_account_balance) : data.main_account_balance,
+            savingsBalance: typeof data.savings_chamber_balance === 'string' ? 
+              parseFloat(data.savings_chamber_balance) : data.savings_chamber_balance
           });
         }
         
@@ -90,8 +97,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (data) {
         setAccount({
-          mainBalance: parseFloat(data.main_account_balance),
-          savingsBalance: parseFloat(data.savings_chamber_balance)
+          mainBalance: typeof data.main_account_balance === 'string' ? 
+            parseFloat(data.main_account_balance) : data.main_account_balance,
+          savingsBalance: typeof data.savings_chamber_balance === 'string' ? 
+            parseFloat(data.savings_chamber_balance) : data.savings_chamber_balance
         });
       }
     } catch (err) {
