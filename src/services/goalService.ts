@@ -33,16 +33,17 @@ export const createSavingsGoal = async (
   category: GoalCategory
 ): Promise<{ goal: SavingsGoal | null; error: any }> => {
   try {
+    // Fixed: Use a single object for insert instead of an array
     const { data, error } = await supabase
       .from('savings_goals')
-      .insert([{
+      .insert({
         user_id: userId,
         title,
-        target_amount: targetAmount.toString(), // Convert to string for Supabase
-        current_amount: '0', // Using string for consistency
+        target_amount: targetAmount,
+        current_amount: 0,
         deadline: deadline.toISOString(),
         category
-      }])
+      })
       .select()
       .single();
 
@@ -90,7 +91,7 @@ export const contributeToGoal = async (
     
     const { error: updateError } = await supabase
       .from('savings_goals')
-      .update({ current_amount: newAmount.toString() }) // Convert to string for Supabase
+      .update({ current_amount: newAmount })
       .eq('id', goalId);
 
     if (updateError) {

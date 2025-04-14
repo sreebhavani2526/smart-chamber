@@ -35,17 +35,17 @@ export const createTransaction = async (
   category?: string
 ): Promise<{ transaction: Transaction | null; error: any }> => {
   try {
-    // Create transaction record
+    // Create transaction record - fixed to use a single object
     const { data, error } = await supabase
       .from('transactions')
-      .insert([{
+      .insert({
         user_id: userId,
-        amount: amount.toString(), // Convert to string for Supabase
+        amount: amount,
         type: type,
         chamber: chamber,
         description,
         category
-      }])
+      })
       .select()
       .single();
 
@@ -117,12 +117,12 @@ const updateBalance = async (
       savingsBalance -= amount;
     }
 
-    // Update user balances - convert numbers to strings for Supabase
+    // Update user balances - use numeric values directly in update
     const { error: updateError } = await supabase
       .from('users')
       .update({
-        main_account_balance: mainBalance.toString(),
-        savings_chamber_balance: savingsBalance.toString()
+        main_account_balance: mainBalance,
+        savings_chamber_balance: savingsBalance
       })
       .eq('id', userId);
 

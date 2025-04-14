@@ -44,16 +44,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (error) {
           console.error("Error fetching account data:", error);
           // If no data, create initial account with mock data
+          // Note: Insert takes an array of objects
           const { error: insertError } = await supabase
             .from('users')
-            .insert({
-              id: mockUser.id,
+            .insert([{
               banking_id: 'mock-banking-id',
               email: mockUser.email,
               password: 'mock-password',
               main_account_balance: '1500',
-              savings_chamber_balance: '2500'
-            });
+              savings_chamber_balance: '2500',
+              id: mockUser.id // Use id directly in the object
+            }]);
             
           if (insertError) {
             console.error("Error creating user:", insertError);
@@ -66,9 +67,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } else if (data) {
           setAccount({
             mainBalance: typeof data.main_account_balance === 'string' ? 
-              parseFloat(data.main_account_balance) : data.main_account_balance,
+              parseFloat(data.main_account_balance) : data.main_account_balance ?? 0,
             savingsBalance: typeof data.savings_chamber_balance === 'string' ? 
-              parseFloat(data.savings_chamber_balance) : data.savings_chamber_balance
+              parseFloat(data.savings_chamber_balance) : data.savings_chamber_balance ?? 0
           });
         }
         
@@ -98,9 +99,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (data) {
         setAccount({
           mainBalance: typeof data.main_account_balance === 'string' ? 
-            parseFloat(data.main_account_balance) : data.main_account_balance,
+            parseFloat(data.main_account_balance) : data.main_account_balance ?? 0,
           savingsBalance: typeof data.savings_chamber_balance === 'string' ? 
-            parseFloat(data.savings_chamber_balance) : data.savings_chamber_balance
+            parseFloat(data.savings_chamber_balance) : data.savings_chamber_balance ?? 0
         });
       }
     } catch (err) {
