@@ -40,7 +40,7 @@ export const createTransaction = async (
       .from('transactions')
       .insert({
         user_id: userId,
-        amount: amount,
+        amount: amount.toString(), // Convert to string for Supabase
         type: type,
         chamber: chamber,
         description,
@@ -117,12 +117,12 @@ const updateBalance = async (
       savingsBalance -= amount;
     }
 
-    // Update user balances
+    // Update user balances - convert numbers to strings for Supabase
     const { error: updateError } = await supabase
       .from('users')
       .update({
-        main_account_balance: mainBalance,
-        savings_chamber_balance: savingsBalance
+        main_account_balance: mainBalance.toString(),
+        savings_chamber_balance: savingsBalance.toString()
       })
       .eq('id', userId);
 

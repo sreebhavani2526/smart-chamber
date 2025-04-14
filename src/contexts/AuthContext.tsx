@@ -49,8 +49,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             banking_id: 'mock-banking-id',
             email: mockUser.email,
             password: 'mock-password',
-            main_account_balance: 1500,
-            savings_chamber_balance: 2500
+            // Convert number values to strings for Supabase
+            main_account_balance: '1500',
+            savings_chamber_balance: '2500'
           });
           
           setAccount({

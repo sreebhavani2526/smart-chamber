@@ -38,8 +38,8 @@ export const createSavingsGoal = async (
       .insert({
         user_id: userId,
         title,
-        target_amount: targetAmount,
-        current_amount: 0,
+        target_amount: targetAmount.toString(), // Convert to string for Supabase
+        current_amount: '0', // Using string for consistency
         deadline: deadline.toISOString(),
         category
       })
@@ -90,7 +90,7 @@ export const contributeToGoal = async (
     
     const { error: updateError } = await supabase
       .from('savings_goals')
-      .update({ current_amount: newAmount })
+      .update({ current_amount: newAmount.toString() }) // Convert to string for Supabase
       .eq('id', goalId);
 
     if (updateError) {
